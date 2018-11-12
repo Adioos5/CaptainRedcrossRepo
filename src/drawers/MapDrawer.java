@@ -32,6 +32,7 @@ public class MapDrawer extends JPanel implements ActionListener, KeyListener, Mo
     private Boolean moveLeft = false;
     private Boolean printWarning = false;
 
+    private Boolean isRequestFocusSent= false;
     private int playerX = 1000;
     private int playerY = 500;
     private int playerSpeed = 5;
@@ -55,7 +56,7 @@ public class MapDrawer extends JPanel implements ActionListener, KeyListener, Mo
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        victim1 = new Victim("Unconscious",Color.yellow,new Rectangle(200, 250, 100, 50),Color.green);
+        victim1 = new Victim("Unconscious", Color.yellow, new Rectangle(200, 250, 100, 50), Color.green);
         actions = new ActionsContainer(1).getAllActions();
 
         timer = new Timer(delay, this);
@@ -95,7 +96,7 @@ public class MapDrawer extends JPanel implements ActionListener, KeyListener, Mo
 
         //victim1
         g.setColor(victim1.getVictimColor());
-        g.fillRect((int) victim1.getVictim().getX(),(int) victim1.getVictim().getY(),(int)victim1.getVictim().getWidth(),(int)victim1.getVictim().getHeight());
+        g.fillRect((int) victim1.getVictim().getX(), (int) victim1.getVictim().getY(), (int) victim1.getVictim().getWidth(), (int) victim1.getVictim().getHeight());
 
         //victim1sState
         g.setColor(victim1.getStatusColor());
@@ -149,32 +150,38 @@ public class MapDrawer extends JPanel implements ActionListener, KeyListener, Mo
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        timer.start();
-        repaint();
-        onUpdate();
+        if (SceneObserver.currentScene.equals("game")) {
+            if (!isRequestFocusSent) {
+                requestFocusInWindow();
+                isRequestFocusSent = true;
+            }
 
-        if (moveUp) {
-            playerY -= playerSpeed;
+            timer.start();
+            repaint();
+            onUpdate();
+
+            if (moveUp) {
+                playerY -= playerSpeed;
+            }
+
+            if (moveDown) {
+                playerY += playerSpeed;
+            }
+
+            if (moveRight) {
+                playerX += playerSpeed;
+            }
+
+            if (moveLeft) {
+                playerX -= playerSpeed;
+            }
+
+            if (playerFeet.intersects(victim1.getVictim())) {
+                printWarning = true;
+            } else {
+                printWarning = false;
+            }
         }
-
-        if (moveDown) {
-            playerY += playerSpeed;
-        }
-
-        if (moveRight) {
-            playerX += playerSpeed;
-        }
-
-        if (moveLeft) {
-            playerX -= playerSpeed;
-        }
-
-        if (playerFeet.intersects(victim1.getVictim())) {
-            printWarning = true;
-        } else {
-            printWarning = false;
-        }
-
     }
 
     @Override
@@ -265,12 +272,18 @@ public class MapDrawer extends JPanel implements ActionListener, KeyListener, Mo
 
         switch (actionText) {
             case "Check Breathe":
+                SceneObserver.currentScene = "checkBreathe";
+                isRequestFocusSent = false;
                 CardLayout cardLayout = (CardLayout) getParent().getLayout();
                 cardLayout.show(getParent(), "CheckBreatheDrawer");
+
                 break;
             case "Search":
+                SceneObserver.currentScene = "search";
+
                 CardLayout cardLayout1 = (CardLayout) getParent().getLayout();
                 cardLayout1.show(getParent(), "SearchDrawer");
+
                 break;
             case "Right Pos":
 

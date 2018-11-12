@@ -28,6 +28,8 @@ public class FrameContainer extends JFrame{
         mainPanel.add(search, "SearchDrawer");
         mainPanel.add(checkBreath, "CheckBreatheDrawer");
 
+
+
         setSize(1280,680);
         setTitle("Captain Redcross");
         setLocationRelativeTo(null);
